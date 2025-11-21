@@ -1,0 +1,49 @@
+<%- include ("templates/header.ejs", {titulo: titulo}) %> 
+<div class="container mt-4">
+    <h2>Editar Artículo</h2>
+    
+    <form action="/editarArticulo" enctype="multipart/form-data" method="POST">
+        <input type="hidden" name="id" value="<%= articulo._id %>">
+        
+        <div class="form-group mb-3">
+            <label for="nombre">Nombre</label>
+            <input type="text" class="form-control" id="nombre" name="nombre" value="<%= articulo.nombre %>" required>
+        </div>
+
+        <div class="form-group mb-3">
+            <label for="categoria">Categoría</label>
+            <select class="form-select" id="categoria" name="categoria" required>
+                <% categorias.forEach(function(categoria) { %>
+                    <option value="<%= categoria._id %>" 
+                        <%= categoria._id.toString() === articulo.categoria._id.toString() ? 'selected' : '' %>>
+                        <%= categoria.nombre %>
+                    </option>
+                <% }); %>
+            </select>
+        </div>
+
+       <div class="mb-3">
+        <label for="calificacion" class="form-label">Calificación</label>
+        <select class="form-select" id="calificacion" name="calificacion" required>
+          <option value="1">una estrella</option>
+          <option value="2">dos estrella</option>
+          <option value="3">tres estrella</option>
+          <option value="4">cuatro estrella</option>
+          <option value="5">cinco estrella</option>
+        </select>
+      </div>
+
+        <div class="mb-3">
+            <label for="foto" class="form-label">Imagen</label>
+            <input id="foto" type="file" name="foto" class="form-control" accept="image/*" required>
+        </div>
+
+
+        <button type="submit" class="btn btn-primary">Actualizar</button>
+        <a href="/" class="btn btn-secondary">Cancelar</a>
+    </form>
+</div>
+<%- include ("templates/footer.ejs") %>
+
+
+

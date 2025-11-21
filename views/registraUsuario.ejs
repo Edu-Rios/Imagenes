@@ -1,0 +1,90 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Usuario</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow">
+                    <div class="card-body p-4">
+                        <h2 class="card-title text-center mb-4">Registro de Usuario</h2>
+                        
+                        <form action="/registarUsuario" method="POST">
+                            <!-- Campo Nombre -->
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre Completo</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="nombre" 
+                                    name="nombre" 
+                                    placeholder="Ingresa tu nombre completo"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Campo Usuario -->
+                            <div class="mb-3">
+                                <label for="usuario" class="form-label">Usuario</label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    id="usuario" 
+                                    name="usuario" 
+                                    placeholder="Elige un nombre de usuario"
+                                    required
+                                >
+                            </div>
+
+                            <!-- Campo contrasenya -->
+                            <div class="mb-3">
+                                <label for="contrasenya" class="form-label">contrasenya</label>
+                                <input 
+                                    type="password" 
+                                    class="form-control" 
+                                    id="contrasenya" 
+                                    name="contrasenya" 
+                                    placeholder="Crea una contrasenya segura"
+                                    required
+                                >
+                            </div>
+
+                             <!-- Campo rol -->
+                            <div class="mb-3">
+                            <label for="rol" class="form-label">Rol</label>
+                            <select 
+                                class="form-select" 
+                                id="rol" 
+                                name="rol" 
+                                required
+                            >
+                            <option value="">Seleccione un rol...</option>
+                            <option value="usuario">Usuario</option>
+                            <option value="admin">Administrador</option>
+                            </select>
+                            </div>
+                           
+
+                            <!-- Botón Agregar -->
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    Agregar Usuario
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+               
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

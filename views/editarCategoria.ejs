@@ -1,0 +1,45 @@
+<%- include ("templates/header.ejs", {titulo:"categoria"}) %> 
+  <h1 class="text-primary"> MODIFICAR </h1>
+
+    <div class="container">
+        <div class="category-box">
+            <form action="/editarCategoria" method="POST">
+                <input type="hidden" name="id" value="<%= categoria._id %>">
+                
+                <div class="form-group">
+                    <label for="nombre">Nombre de la categoría *</label>
+                    <input 
+                        type="text" 
+                        id="nombre" 
+                        name="nombre" 
+                        value="<%= categoria.nombre %>"
+                        placeholder="Ej: Videojuegos, Películas, Series, Libros..." 
+                        required 
+                        minlength="2" 
+                        maxlength="50"
+                    >
+                    <small class="form-hint">Mínimo 2 caracteres, máximo 50</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea 
+                        id="descripcion" 
+                        name="descripcion" 
+                        rows="4"
+                        placeholder="Describe qué tipo de contenido guardará esta categoría (opcional)"
+                        maxlength="200"
+                        required
+                    ><%= categoria.descripcion %></textarea>
+                    <small class="form-hint character-count">0 / 200 caracteres</small>
+                </div>
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Actualizar categoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<%- include ("templates/footer.ejs") %>
+

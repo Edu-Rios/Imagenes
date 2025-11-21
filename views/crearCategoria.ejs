@@ -1,0 +1,63 @@
+<%- include ("templates/header.ejs", {titulo:"categoria"}) %> 
+  <h1 class="text-primary">INICIO</h1>
+
+    <div class="container">
+        <div class="category-box">
+            <div class="header">
+                <p>Crea una categoría para organizar tus favoritos</p>
+            </div>
+
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-error">
+                    <%= error %>
+                </div>
+            <% } %>
+
+            <% if (typeof success !== 'undefined' && success) { %>
+                <div class="alert alert-success">
+                    <%= success %>
+                </div>
+            <% } %>
+
+            <form action="/categories/add" method="POST">
+                <div class="form-group">
+                    <label for="nombre">Nombre de la categoría *</label>
+                    <input type="text" id="nombre" name="nombre" placeholder="Ej: Videojuegos, Películas, Series, Libros..."
+                        required
+                        minlength="2"
+                        maxlength="50"
+                    >
+                    <small class="form-hint">Mínimo 2 caracteres, máximo 50</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea 
+                        id="descripcion" 
+                        name="descripcion" 
+                        rows="4"
+                        placeholder="Describe qué tipo de contenido guardará esta categoría (opcional)"
+                        maxlength="200"
+                        required
+                    ></textarea>
+                    <small class="form-hint character-count">0 / 200 caracteres</small>
+                </div>
+
+
+                <div class="button-group">
+                    <button type="submit" class="btn btn-primary">Crear categoría</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/add-category.js"></script>
+</body>
+</html>
+
+  
+  
+  
+ 
+<%- include ("templates/footer.ejs") %>
+

@@ -1,0 +1,46 @@
+<%- include ("templates/header.ejs", {titulo:"crear Articulos"}) %> 
+
+  <div class="container mt-4">
+    <form action="/crear" enctype="multipart/form-data" method="POST" class="needs-validation">
+      <div class="mb-3">
+        <label for="nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="nombre" name="nombre" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="categoria" class="form-label">Categoría</label>
+        <select class="form-select" id="categoria" name="categoria" required>
+          <option value="">Seleccione una categoría</option>
+          <% if(typeof categorias !== 'undefined') { %>
+            <% categorias.forEach(function(categoria) { %>
+              <option value="<%= categoria._id %>"><%= categoria.nombre %></option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="calificacion" class="form-label">Calificación</label>
+        <select class="form-select" id="calificacion" name="calificacion" required>
+          <option value="1">una estrella</option>
+          <option value="2">dos estrella</option>
+          <option value="3">tres estrella</option>
+          <option value="4">cuatro estrella</option>
+          <option value="5">cinco estrella</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="foto" class="form-label">Imagen</label>
+        <input id="foto" type="file" name="foto" class="form-control" accept="image/*" required>
+      </div>
+
+
+      <button type="submit" class="btn btn-primary">Crear</button>
+    </form>
+  </div>
+
+<%- include ("templates/footer.ejs") %>
+
+
+
