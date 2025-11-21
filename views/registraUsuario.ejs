@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -15,63 +14,37 @@
                     <div class="card-body p-4">
                         <h2 class="card-title text-center mb-4">Registro de Usuario</h2>
                         
-                        <form action="/registarUsuario" method="POST">
-                            <!-- Campo Nombre -->
+                        <form action="/registarUsuario" method="POST" enctype="multipart/form-data">
+                            
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre Completo</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="nombre" 
-                                    name="nombre" 
-                                    placeholder="Ingresa tu nombre completo"
-                                    required
-                                >
+                                <input type="text" class="form-control" id="nombre" name="nombre" placeholder="Ingresa tu nombre completo" required>
                             </div>
 
-                            <!-- Campo Usuario -->
                             <div class="mb-3">
                                 <label for="usuario" class="form-label">Usuario</label>
-                                <input 
-                                    type="text" 
-                                    class="form-control" 
-                                    id="usuario" 
-                                    name="usuario" 
-                                    placeholder="Elige un nombre de usuario"
-                                    required
-                                >
+                                <input type="text" class="form-control" id="usuario" name="usuario" placeholder="Elige un nombre de usuario" required>
                             </div>
 
-                            <!-- Campo contrasenya -->
                             <div class="mb-3">
-                                <label for="contrasenya" class="form-label">contrasenya</label>
-                                <input 
-                                    type="password" 
-                                    class="form-control" 
-                                    id="contrasenya" 
-                                    name="contrasenya" 
-                                    placeholder="Crea una contrasenya segura"
-                                    required
-                                >
+                                <label for="contrasenya" class="form-label">Contraseña</label>
+                                <input type="password" class="form-control" id="contrasenya" name="contrasenya" placeholder="Crea una contraseña segura" required>
                             </div>
 
-                             <!-- Campo rol -->
                             <div class="mb-3">
-                            <label for="rol" class="form-label">Rol</label>
-                            <select 
-                                class="form-select" 
-                                id="rol" 
-                                name="rol" 
-                                required
-                            >
-                            <option value="">Seleccione un rol...</option>
-                            <option value="usuario">Usuario</option>
-                            <option value="admin">Administrador</option>
-                            </select>
+                                <label for="foto" class="form-label">Foto de Perfil</label>
+                                <input type="file" class="form-control" id="foto" name="foto" accept="image/*">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="rol" class="form-label">Rol</label>
+                                <select class="form-select" id="rol" name="rol" required>
+                                    <option value="">Seleccione un rol...</option>
+                                    <option value="usuario">Usuario</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
                             </div>
                            
-
-                            <!-- Botón Agregar -->
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     Agregar Usuario
@@ -80,7 +53,6 @@
                         </form>
                     </div>
                 </div>
-               
             </div>
         </div>
     </div>

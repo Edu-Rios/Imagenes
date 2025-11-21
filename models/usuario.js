@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose';
 
 const usuarioSchema = new mongoose.Schema({
@@ -16,14 +15,17 @@ const usuarioSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
-
+    },
+    // ---> NUEVO CAMPO
+    foto: {
+        type: String,
+        default: null
     },
     rol: {
-    type: String,
-    enum: ["admin", "usuario"],
-    default: "usuario"
-  }
-
+        type: String,
+        enum: ["admin", "usuario"],
+        default: "usuario"
+    }
 });
 
 export default mongoose.model("Usuario", usuarioSchema);

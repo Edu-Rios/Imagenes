@@ -1,6 +1,7 @@
 import articulo  from "../models/articulos.js";
 import multer  from "multer";
 
+
 export async function crearArticulo({nombre, categoria, calificacion, imagen}){
     const nuevoArticulo = new articulo({
         nombre: nombre,
