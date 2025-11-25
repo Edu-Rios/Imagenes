@@ -1,0 +1,27 @@
+<%- include("templates/header.ejs", {titulo: "Compartir Artículo"}) %>
+<div class="container mt-4">
+    <div class="card shadow-sm col-md-6 mx-auto">
+        <div class="card-body">
+            <h3 class="card-title text-center text-primary mb-4">Compartir Artículo</h3>
+            <form action="/procesarCompartir" method="POST">
+                <input type="hidden" name="idArticulo" value="<%= idArticulo %>">
+                
+                <div class="mb-3">
+                    <label class="form-label">Selecciona el usuario destino:</label>
+                    <select name="idReceptor" class="form-select" required>
+                        <option value="">-- Seleccionar Usuario --</option>
+                        <% usuarios.forEach(u => { %>
+                            <option value="<%= u._id %>"><%= u.usuario %> (<%= u.nombre %>)</option>
+                        <% }) %>
+                    </select>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">Enviar</button>
+                    <a href="/inicio" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<%- include("templates/footer.ejs") %>

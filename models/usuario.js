@@ -16,15 +16,19 @@ const usuarioSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    // ---> NUEVO CAMPO
     foto: {
         type: String,
         default: null
     },
+ 
     rol: {
         type: String,
         enum: ["admin", "usuario"],
-        default: "usuario"
+        default: "usuario" // Todos se registran como usuarios normales
+    },
+    suspendido: {
+        type: Boolean,
+        default: false // Por defecto la cuenta está activa
     }
 });
 

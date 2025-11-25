@@ -1,8 +1,6 @@
 <%- include ("templates/header.ejs", {titulo:"INICIO"}) %> 
   <h1 class="text-primary">INICIO</h1>
 
-   
-
    <div class="container mt-4">
        <% categorias.forEach(function(categoria) { %>
          <div class="category-section mb-5">
@@ -16,34 +14,32 @@
                </tr>
              </thead>
              <tbody>
-    <% const articulosCategoria = articulos.filter(art => 
-        art.categoria && 
-        art.categoria._id && 
-        art.categoria._id.toString() === categoria._id.toString()
-    ) %>
-    <% if(articulosCategoria.length > 0) { %>
-        <% articulosCategoria.forEach(function(articulo) { %>
-            <tr>
-                <td><%= articulo.nombre %></td>
-                <td><%= articulo.calificacion %></td>
-                <td>
-                    <a href="/editar/<%= articulo._id %>" class="btn btn-warning btn-sm">Editar</a>
-                    <a href="/eliminarArticulo/<%= articulo._id %>" class="btn btn-danger btn-sm">Eliminar</a>
-                </td>
-            </tr>
-        <% }); %>
-    <% } else { %>
-        <tr>
-            <td colspan="3" class="text-center">No hay artículos en esta categoría</td>
-        </tr>
-    <% } %>
-</tbody>
+            <% const articulosCategoria = articulos.filter(art => 
+                art.categoria && 
+                art.categoria._id && 
+                art.categoria._id.toString() === categoria._id.toString()
+            ) %>
+            <% if(articulosCategoria.length > 0) { %>
+                <% articulosCategoria.forEach(function(articulo) { %>
+                    <tr>
+                        <td><%= articulo.nombre %></td>
+                        <td><%= articulo.calificacion %></td>
+                        <td>
+                            <a href="/editar/<%= articulo._id %>" class="btn btn-warning btn-sm">Editar</a>
+                            <a href="/eliminarArticulo/<%= articulo._id %>" class="btn btn-danger btn-sm">Eliminar</a>
+                            <a href="/compartir/<%= articulo._id %>" class="btn btn-info btn-sm">Compartir</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } else { %>
+                <tr>
+                    <td colspan="3" class="text-center">No hay artículos en esta categoría</td>
+                </tr>
+            <% } %>
+            </tbody>
            </table>
          </div>
        <% }); %>
    </div>
 
 <%- include ("templates/footer.ejs") %>
-
-
-

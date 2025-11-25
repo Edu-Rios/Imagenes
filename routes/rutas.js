@@ -1,14 +1,16 @@
 import { Router } from "express";
 import { crearCategoria, mostrarCategoria, eliminarCategoria, actualizarCategoria, obtenerCategoriaPorId } from "../bd/CategoriaBd.js";
 import { crearArticulo, subirArchivo as subirArchivoArticulo, mostrarArticulos, eliminarArticulo, mostrarArticuloPorId, editarArticulo } from "../bd/ArticulosBD.js";
-import { registrarUsuario, verificarUsuario, obtenerUsuarioPorId, editarUsuario, eliminarUsuario } from "../bd/usuarioBD.js";
+import { registrarUsuario, verificarUsuario, obtenerUsuarioPorId, editarUsuario, eliminarUsuario, obtenerTodosLosUsuarios, cambiarEstadoUsuario, cambiarRolUsuario } from "../bd/usuarioBD.js";
 import { subirArchivo as subirFotoPerfil } from "../middlewares/subirArchivos.js";
+// NUEVA IMPORTACIÓN
+import { compartirArticulo, verCompartidosConmigo, verCompartidosPorMi } from "../bd/compartirBD.js";
 
 const router = Router();
 
 // Configuración de multer
-const uploadArticulo = subirArchivoArticulo(); // Para artículos (existente)
-const uploadPerfil = subirFotoPerfil();        // Para perfil (nuevo)
+const uploadArticulo = subirArchivoArticulo(); 
+const uploadPerfil = subirFotoPerfil();       
 
 function requireLogin(req, res, next) {
   if (!req.session || !req.session.usuario) {
@@ -17,17 +19,8 @@ function requireLogin(req, res, next) {
   next();
 }
 
-// Solo usuario normal
-function requireUser(req, res, next) {
-  if (req.session.usuario && req.session.usuario.rol === "usuario") {
-    return next();
-  }
-  res.status(403).send("Acceso denegado: Solo usuarios normales");
-}
-
-// Solo administrador
 function requireAdmin(req, res, next) {
-  if (req.session.usuario && req.session.usuario.rol === "admin") {
+  if (req.session.usuario && req.session.rol === "admin") {
     return next();
   }
   res.status(403).send("Acceso denegado: Solo administradores");
@@ -53,6 +46,8 @@ router.post("/login", async (req, res) => {
     req.session.usuario = resultado.usuario._id;
     req.session.nombre = resultado.usuario.nombre;
     req.session.rol = resultado.usuario.rol;
+    
+    // Si es admin, redirigir a panel admin, si no a inicio normal (opcional, aqui va a inicio todos)
     res.redirect("/inicio");
   } else {
     res.render("login.ejs", {
@@ -66,45 +61,99 @@ router.get("/registarUsuario", (req,res)=>{
     res.render("registraUsuario.ejs", {titulo: "Registro de Usuario"})
 })
 
-// MODIFICADO: Usar middleware uploadPerfil y guardar foto
 router.post("/registarUsuario", uploadPerfil, async (req, res) => {
     const datos = req.body;
-    // Si se subió foto, guardar el nombre del archivo
     if (req.file) {
         datos.foto = req.file.filename;
     }
+    // rol y suspendido se ponen por defecto en el modelo
     const respuesta = await registrarUsuario(datos);
     console.log(respuesta);
     res.redirect("/");
 });
 
-//Ver Perfil
 router.get("/perfil", requireLogin, async (req, res) => {
     const usuario = await obtenerUsuarioPorId(req.session.usuario);
     res.render("perfil.ejs", { titulo: "Mi Perfil", usuario });
 });
 
-//Editar Perfil
 router.post("/editarPerfil", requireLogin, uploadPerfil, async (req, res) => {
     const { id, nombre, usuario, contrasenya } = req.body;
     const nuevaFoto = req.file ? req.file.filename : null;
     
     await editarUsuario(id, { nombre, usuario, contrasenya }, nuevaFoto);
-    
-    // Actualizar nombre en sesión por si cambio
     req.session.nombre = nombre;
-    
     res.redirect("/perfil");
 });
 
-// Borrar Cuenta
 router.get("/borrarMiCuenta", requireLogin, async (req, res) => {
     const id = req.session.usuario;
     await eliminarUsuario(id);
-    
     req.session.destroy();
     res.clearCookie(process.env.NOMBRE_COOKIE || "session_usuario", { path: "/" });
     res.redirect("/");
+});
+
+// NUEVAS RUTAS DE ADMINISTRADOR *****************************************
+
+router.get("/admin/usuarios", requireAdmin, async (req, res) => {
+    const usuarios = await obtenerTodosLosUsuarios();
+    res.render("adminUsuarios.ejs", { titulo: "Admin Usuarios", usuarios });
+});
+
+router.get("/admin/hacerAdmin/:id", requireAdmin, async (req, res) => {
+    await cambiarRolUsuario(req.params.id, "admin");
+    res.redirect("/admin/usuarios");
+});
+
+router.get("/admin/hacerUsuario/:id", requireAdmin, async (req, res) => {
+    await cambiarRolUsuario(req.params.id, "usuario");
+    res.redirect("/admin/usuarios");
+});
+
+router.get("/admin/suspender/:id", requireAdmin, async (req, res) => {
+    await cambiarEstadoUsuario(req.params.id, true);
+    res.redirect("/admin/usuarios");
+});
+
+router.get("/admin/activar/:id", requireAdmin, async (req, res) => {
+    await cambiarEstadoUsuario(req.params.id, false);
+    res.redirect("/admin/usuarios");
+});
+
+// NUEVAS RUTAS DE COMPARTIR ********************************************
+
+router.get("/compartir/:idArticulo", requireLogin, async (req, res) => {
+    const usuarios = await obtenerTodosLosUsuarios();
+    // Filtramos para que no aparezca el mismo usuario en la lista
+    const otrosUsuarios = usuarios.filter(u => u._id.toString() !== req.session.usuario);
+    
+    res.render("formCompartir.ejs", { 
+        titulo: "Compartir", 
+        usuarios: otrosUsuarios,
+        idArticulo: req.params.idArticulo 
+    });
+});
+
+router.post("/procesarCompartir", requireLogin, async (req, res) => {
+    const { idArticulo, idReceptor } = req.body;
+    await compartirArticulo({
+        emisor: req.session.usuario,
+        receptor: idReceptor,
+        articulo: idArticulo
+    });
+    res.redirect("/misCompartidos");
+});
+
+router.get("/misCompartidos", requireLogin, async (req, res) => {
+    const recibidos = await verCompartidosConmigo(req.session.usuario);
+    const enviados = await verCompartidosPorMi(req.session.usuario);
+    
+    res.render("misCompartidos.ejs", { 
+        titulo: "Compartidos", 
+        recibidos, 
+        enviados 
+    });
 });
 
 
@@ -114,25 +163,25 @@ router.get("/categoria", requireAdmin,(req,res)=>{
     res.render("crearCategoria.ejs", {titulo: "categoria"})
 })
 
-router.post("/categories/add", async (req,res)=>{
+router.post("/categories/add", requireAdmin, async (req,res)=>{
     const respuestaMongo= await crearCategoria(req.body)
     console.log(respuestaMongo)
     res.redirect("/mostarCategoria")
 })
 
-router.get("/mostarCategoria", async (req,res)=>{
+router.get("/mostarCategoria", requireAdmin, async (req,res)=>{ // Protegido para admin según lógica
     const categoriasBD = await mostrarCategoria()
     res.render("mostarCategoria.ejs", {categoriasBD})
 })
 
-router.get("/borrarCategoria/:id", async (req,res)=>{
+router.get("/borrarCategoria/:id", requireAdmin, async (req,res)=>{
     const {id} = req.params
     const respuestaMongo = await eliminarCategoria(id)
     console.log(respuestaMongo)
     res.redirect("/mostarCategoria")
 })
 
-router.get("/editarCategoria/:id", async (req,res)=>{
+router.get("/editarCategoria/:id", requireAdmin, async (req,res)=>{
     try {
         const id = req.params.id;
         const categoria = await obtenerCategoriaPorId(id);
@@ -143,13 +192,10 @@ router.get("/editarCategoria/:id", async (req,res)=>{
     }
 });
 
-router.post("/editarCategoria", async (req, res) => {
+router.post("/editarCategoria", requireAdmin, async (req, res) => {
     try {
         const { id, nombre, descripcion } = req.body;
-        const respuestaMongo = await actualizarCategoria(id, {
-            nombre,
-            descripcion
-        });
+        await actualizarCategoria(id, { nombre, descripcion });
         res.redirect("/mostarCategoria");
     } catch (error) {
         console.error("Error updating category:", error);
@@ -159,7 +205,7 @@ router.post("/editarCategoria", async (req, res) => {
 
 // ARTICULOS ROUTES ***************************************************************
 
-router.get("/inicio", requireLogin,async (req, res) => {
+router.get("/inicio", requireLogin, async (req, res) => {
     try {
         const [articulos, categorias] = await Promise.all([
             mostrarArticulos(),
@@ -172,14 +218,11 @@ router.get("/inicio", requireLogin,async (req, res) => {
         });
     } catch (error) {
         console.error("Error fetching data:", error);
-        res.render("inicio.ejs", { 
-            articulos: [],
-            categorias: []
-        });
+        res.render("inicio.ejs", { articulos: [], categorias: [] });
     }
 })
 
-router.get("/crearArticulos", requireLogin,async (req,res)=>{
+router.get("/crearArticulos", requireLogin, async (req,res)=>{
     const categoriasBD = await mostrarCategoria()
     res.render("crearArticulos.ejs", {
         titulo: "Crear Articulos",
@@ -187,7 +230,7 @@ router.get("/crearArticulos", requireLogin,async (req,res)=>{
     })
 })
 
-router.post("/crear", uploadArticulo, async(req,res)=>{ // Usamos uploadArticulo aquí
+router.post("/crear", requireLogin, uploadArticulo, async(req,res)=>{
     const datos = req.body;
     datos.imagen = req.file ? req.file.filename : null;
     const articulosBd= await crearArticulo(datos)
@@ -202,7 +245,7 @@ router.get("/eliminarArticulo/:id", requireLogin, async (req,res)=>{
     res.redirect("/inicio")
 })
 
-router.get("/editar/:id", async (req,res)=>{
+router.get("/editar/:id", requireLogin, async (req,res)=>{
     const {id} = req.params;
     const articulo = await mostrarArticuloPorId(id);
     const categoriasBD = await mostrarCategoria();
@@ -213,13 +256,9 @@ router.get("/editar/:id", async (req,res)=>{
     });
 })
 
-router.post("/editarArticulo", async (req,res) => {
+router.post("/editarArticulo", requireLogin, async (req,res) => {
     const { id, nombre, categoria, calificacion } = req.body;
-    const respuestaMongo = await editarArticulo(id, {
-        nombre,
-        categoria,
-        calificacion
-    });
+    await editarArticulo(id, { nombre, categoria, calificacion });
     res.redirect("/inicio");
 });
 
