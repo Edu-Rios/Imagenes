@@ -20,7 +20,7 @@
                 <% } %>
                 <% recibidos.forEach(item => { %>
                    <div class="col-md-4 mb-3">
-                       <div class="card border-primary h-100">
+                       <div class="card border-primary h-100 shadow-sm">
                            <div class="card-body">
                                <h5 class="card-title text-primary">
                                    <%= item.articulo ? item.articulo.nombre : 'Artículo eliminado' %>
@@ -29,6 +29,9 @@
                                    <strong>De:</strong> <%= item.emisor ? item.emisor.usuario : 'Desconocido' %><br>
                                    <small class="text-muted"><%= new Date(item.fecha).toLocaleDateString() %></small>
                                </p>
+                               <% if (item.articulo && item.articulo.imagen) { %>
+                                    <img src="/images/<%= item.articulo.imagen %>" class="img-fluid rounded mt-2" style="max-height: 150px;">
+                               <% } %>
                            </div>
                        </div>
                    </div> 
@@ -43,7 +46,7 @@
                 <% } %>
                 <% enviados.forEach(item => { %>
                    <div class="col-md-4 mb-3">
-                       <div class="card border-success h-100">
+                       <div class="card border-success h-100 shadow-sm">
                            <div class="card-body">
                                <h5 class="card-title text-success">
                                    <%= item.articulo ? item.articulo.nombre : 'Artículo eliminado' %>
@@ -60,4 +63,16 @@
         </div>
     </div>
 </div>
+
+<script>
+    var triggerTabList = [].slice.call(document.querySelectorAll('#myTab button'))
+    triggerTabList.forEach(function (triggerEl) {
+      var tabTrigger = new bootstrap.Tab(triggerEl)
+      triggerEl.addEventListener('click', function (event) {
+        event.preventDefault()
+        tabTrigger.show()
+      })
+    })
+</script>
+
 <%- include("templates/footer.ejs") %>

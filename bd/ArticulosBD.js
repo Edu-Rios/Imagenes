@@ -1,23 +1,25 @@
 import articulo  from "../models/articulos.js";
 import multer  from "multer";
 
-
-export async function crearArticulo({nombre, categoria, calificacion, imagen}){
+// Ahora recibimos el idUsuario
+export async function crearArticulo({nombre, categoria, calificacion, imagen, usuario}){
     const nuevoArticulo = new articulo({
         nombre: nombre,
         categoria: categoria,
         calificacion: calificacion,
-        Imagen: imagen
+        imagen: imagen, // Corregido 'Imagen' a 'imagen' (minúscula) para coincidir con schema
+        usuario: usuario // Guardamos el dueño
     })
     const respuestaMongo = await nuevoArticulo.save();
     return respuestaMongo;
 }
 
-export async function mostrarArticulos(){
-    const articulosBD = await articulo.find().populate("categoria").lean();
+// Modificado para recibir idUsuario y filtrar
+export async function mostrarArticulos(idUsuario){
+    // Busca solo los artículos donde el campo 'usuario' coincida con el idUsuario
+    const articulosBD = await articulo.find({ usuario: idUsuario }).populate("categoria").lean();
     return articulosBD;
 }
-
 
 export async function mostrarArticuloPorId(id){
     const articuloBD = await articulo.findById(id).populate("categoria").lean();
@@ -37,12 +39,11 @@ export async function eliminarArticulo(id){
 export function subirArchivo() {
     const storage = multer.diskStorage({
         destination:"./web/images",
-        filename: function(req, file, cb) { //cb: callback para recibir funcion como parametro, a donde vuelve
+        filename: function(req, file, cb) { 
         const archivo = file.originalname
-        cb(null, Date.now()  + archivo)  // date.now(): para que no se repitan los nombres, se les agregga la fecha y el milisegundo 
-        
+        cb(null, Date.now()  + archivo)  
         }
     })
-    const upload = multer({storage}). single ("foto")           //single("archivo") el single es para subir un solo archivo, el nombre del input
-    return upload                                                   //array("fotos", 2) para subir varios archivos, el nombre del input y la cantidad maxima de archivos
-}                                                                         
+    const upload = multer({storage}).single("foto")
+    return upload                                                   
+}

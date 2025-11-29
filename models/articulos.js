@@ -20,10 +20,13 @@ const articulosSchema = new mongoose.Schema({
     imagen: {
         type: String,
         required: false
+    },
+    // ---> NUEVO: Relación con el Usuario (Dueño)
+    usuario: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Usuario",
+        required: true
     }
-
-})  
-
-
+});
 
 export default mongoose.model("Articulos", articulosSchema);

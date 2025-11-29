@@ -1,10 +1,8 @@
 import { Router } from "express";
 import { crearCategoria, mostrarCategoria, eliminarCategoria, actualizarCategoria, obtenerCategoriaPorId } from "../bd/CategoriaBd.js";
 import { crearArticulo, subirArchivo as subirArchivoArticulo, mostrarArticulos, eliminarArticulo, mostrarArticuloPorId, editarArticulo } from "../bd/ArticulosBD.js";
-// Importamos las nuevas funciones de usuario
 import { registrarUsuario, verificarUsuario, obtenerUsuarioPorId, editarUsuario, eliminarUsuario, obtenerTodosLosUsuarios, cambiarEstadoUsuario, cambiarRolUsuario } from "../bd/usuarioBD.js";
 import { subirArchivo as subirFotoPerfil } from "../middlewares/subirArchivos.js";
-// Importamos las funciones de compartir
 import { compartirArticulo, verCompartidosConmigo, verCompartidosPorMi } from "../bd/compartirBD.js";
 
 const router = Router();
@@ -12,7 +10,6 @@ const router = Router();
 const uploadArticulo = subirArchivoArticulo(); 
 const uploadPerfil = subirFotoPerfil();       
 
-// Middlewares de seguridad
 function requireLogin(req, res, next) {
   if (!req.session || !req.session.usuario) {
     return res.redirect("/"); 
@@ -27,7 +24,7 @@ function requireAdmin(req, res, next) {
   res.status(403).send("Acceso denegado: Solo administradores");
 }
 
-// --- RUTAS DE USUARIO ---
+// USUARIO ****************************************************************
 
 router.get("/", (req,res)=>{
     res.render("login.ejs", {titulo: "Login"})
@@ -60,8 +57,6 @@ router.get("/registarUsuario", (req,res)=>{
 router.post("/registarUsuario", uploadPerfil, async (req, res) => {
     const datos = req.body;
     if (req.file) datos.foto = req.file.filename;
-    
-    // Se registran como usuario normal por defecto (Modelo lo maneja)
     await registrarUsuario(datos);
     res.redirect("/");
 });
@@ -85,7 +80,7 @@ router.get("/borrarMiCuenta", requireLogin, async (req, res) => {
     res.redirect("/");
 });
 
-// --- RUTAS DE ADMINISTRADOR (Puntos 3 y 8) ---
+// ADMIN ROUTES **********************************************************
 
 router.get("/admin/usuarios", requireAdmin, async (req, res) => {
     const usuarios = await obtenerTodosLosUsuarios();
@@ -112,12 +107,11 @@ router.get("/admin/activar/:id", requireAdmin, async (req, res) => {
     res.redirect("/admin/usuarios");
 });
 
-// --- RUTAS DE COMPARTIR (Puntos 5, 6 y 7) ---
+// COMPARTIR ROUTES ******************************************************
 
 router.get("/compartir/:idArticulo", requireLogin, async (req, res) => {
     try {
         const usuarios = await obtenerTodosLosUsuarios();
-        // Filtramos para no mostrarse a uno mismo
         const otrosUsuarios = usuarios.filter(u => u._id.toString() !== req.session.usuario);
         
         res.render("formCompartir.ejs", { 
@@ -126,18 +120,15 @@ router.get("/compartir/:idArticulo", requireLogin, async (req, res) => {
             idArticulo: req.params.idArticulo 
         });
     } catch (error) {
-        console.error("Error al cargar formulario compartir:", error);
-        res.status(500).send("Error del servidor: " + error.message);
+        console.error("Error al cargar form compartir:", error);
+        res.status(500).send("Error interno");
     }
 });
 
 router.post("/procesarCompartir", requireLogin, async (req, res) => {
     try {
         const { idArticulo, idReceptor } = req.body;
-        
-        if (!idReceptor) {
-            return res.send("Error: Debes seleccionar un usuario.");
-        }
+        if (!idReceptor) return res.send("Debes seleccionar un usuario");
 
         await compartirArticulo({
             emisor: req.session.usuario,
@@ -146,7 +137,7 @@ router.post("/procesarCompartir", requireLogin, async (req, res) => {
         });
         res.redirect("/misCompartidos");
     } catch (error) {
-        console.error("Error al procesar compartir:", error);
+        console.error("Error al compartir:", error);
         res.status(500).send("Error al compartir: " + error.message);
     }
 });
@@ -156,6 +147,9 @@ router.get("/misCompartidos", requireLogin, async (req, res) => {
         const recibidos = await verCompartidosConmigo(req.session.usuario);
         const enviados = await verCompartidosPorMi(req.session.usuario);
         
+        // CORRECCIÓN IMPORTANTE: Asegúrate de que el archivo se llame misCompartidos.ejs
+        // Si tu archivo se llama "misCompartirdos.ejs", renómbralo o cambia esta línea.
+        // Aquí asumo que usarás el nombre correcto "misCompartidos.ejs".
         res.render("misCompartidos.ejs", { 
             titulo: "Compartidos", 
             recibidos, 
@@ -163,11 +157,11 @@ router.get("/misCompartidos", requireLogin, async (req, res) => {
         });
     } catch (error) {
         console.error("Error al ver compartidos:", error);
-        res.status(500).send("Error al cargar compartidos: " + error.message);
+        res.status(500).send("Error al cargar compartidos");
     }
 });
 
-// --- RUTAS DE CATEGORIAS ---
+// CATEGORIA ROUTES *******************************************************
 
 router.get("/categoria", requireAdmin, (req,res)=>{
     res.render("crearCategoria.ejs", {titulo: "categoria"})
@@ -199,18 +193,19 @@ router.post("/editarCategoria", requireAdmin, async (req, res) => {
     res.redirect("/mostarCategoria");
 });
 
-// --- RUTAS DE ARTICULOS ---
+// ARTICULOS ROUTES *******************************************************
 
 router.get("/inicio", requireLogin, async (req, res) => {
     try {
         const [articulos, categorias] = await Promise.all([
-            mostrarArticulos(),
+            mostrarArticulos(req.session.usuario), // Pasamos el ID del usuario para filtrar
             mostrarCategoria()
         ]);
-        // Validar que los artículos tengan categoría válida
+        
         const validArticulos = articulos.filter(art => art.categoria && art.categoria._id);
         res.render("inicio.ejs", { articulos: validArticulos, categorias: categorias });
     } catch (error) {
+        console.error(error);
         res.render("inicio.ejs", { articulos: [], categorias: [] });
     }
 })
@@ -223,6 +218,8 @@ router.get("/crearArticulos", requireLogin, async (req,res)=>{
 router.post("/crear", requireLogin, uploadArticulo, async(req,res)=>{
     const datos = req.body;
     datos.imagen = req.file ? req.file.filename : null;
+    datos.usuario = req.session.usuario; // Agregamos el dueño al crear
+    
     await crearArticulo(datos)
     res.redirect("/inicio")
 })
