@@ -1,30 +1,33 @@
 <%- include("templates/header.ejs", {titulo: "Mis Compartidos"}) %>
 <div class="container mt-4">
     
+    <h2 class="mb-4 text-center">Centro de Compartidos</h2>
+
     <ul class="nav nav-tabs mb-4" id="myTab" role="tablist">
-        <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="recibidos-tab" data-bs-toggle="tab" data-bs-target="#recibidos" type="button" role="tab">Recibidos</button>
+        <li class="nav-item">
+            <button class="nav-link active" id="recibidos-tab" data-bs-toggle="tab" data-bs-target="#recibidos" type="button">Recibidos</button>
         </li>
-        <li class="nav-item" role="presentation">
-            <button class="nav-link" id="enviados-tab" data-bs-toggle="tab" data-bs-target="#enviados" type="button" role="tab">Enviados</button>
+        <li class="nav-item">
+            <button class="nav-link" id="enviados-tab" data-bs-toggle="tab" data-bs-target="#enviados" type="button">Enviados</button>
         </li>
     </ul>
 
     <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" id="recibidos" role="tabpanel">
-            <h3 class="text-primary mb-3">Compartido Conmigo</h3>
+        <div class="tab-pane fade show active" id="recibidos">
             <div class="row">
                 <% if(recibidos.length === 0) { %> 
-                    <p class="text-muted">No te han compartido nada aún.</p> 
+                    <div class="col-12 text-center text-muted">No te han compartido nada aún.</div> 
                 <% } %>
                 <% recibidos.forEach(item => { %>
-                   <div class="col-md-4">
-                       <div class="card mb-3 shadow-sm border-primary">
+                   <div class="col-md-4 mb-3">
+                       <div class="card border-primary h-100">
                            <div class="card-body">
-                               <h5 class="card-title"><%= item.articulo ? item.articulo.nombre : 'Artículo borrado' %></h5>
+                               <h5 class="card-title text-primary">
+                                   <%= item.articulo ? item.articulo.nombre : 'Artículo eliminado' %>
+                               </h5>
                                <p class="card-text">
-                                   <small class="text-muted">De:</small> <strong><%= item.emisor ? item.emisor.usuario : 'Usuario desconocido' %></strong><br>
-                                   <small class="text-muted">Fecha:</small> <%= item.fecha.toLocaleDateString() %>
+                                   <strong>De:</strong> <%= item.emisor ? item.emisor.usuario : 'Desconocido' %><br>
+                                   <small class="text-muted"><%= new Date(item.fecha).toLocaleDateString() %></small>
                                </p>
                            </div>
                        </div>
@@ -33,20 +36,21 @@
             </div>
         </div>
 
-        <div class="tab-pane fade" id="enviados" role="tabpanel">
-            <h3 class="text-success mb-3">Compartido Por Mí</h3>
+        <div class="tab-pane fade" id="enviados">
             <div class="row">
                 <% if(enviados.length === 0) { %> 
-                    <p class="text-muted">No has compartido nada aún.</p> 
+                    <div class="col-12 text-center text-muted">No has compartido nada aún.</div> 
                 <% } %>
                 <% enviados.forEach(item => { %>
-                   <div class="col-md-4">
-                       <div class="card mb-3 shadow-sm border-success">
+                   <div class="col-md-4 mb-3">
+                       <div class="card border-success h-100">
                            <div class="card-body">
-                               <h5 class="card-title"><%= item.articulo ? item.articulo.nombre : 'Artículo borrado' %></h5>
+                               <h5 class="card-title text-success">
+                                   <%= item.articulo ? item.articulo.nombre : 'Artículo eliminado' %>
+                               </h5>
                                <p class="card-text">
-                                   <small class="text-muted">Para:</small> <strong><%= item.receptor ? item.receptor.usuario : 'Usuario desconocido' %></strong><br>
-                                   <small class="text-muted">Fecha:</small> <%= item.fecha.toLocaleDateString() %>
+                                   <strong>Para:</strong> <%= item.receptor ? item.receptor.usuario : 'Desconocido' %><br>
+                                   <small class="text-muted"><%= new Date(item.fecha).toLocaleDateString() %></small>
                                </p>
                            </div>
                        </div>

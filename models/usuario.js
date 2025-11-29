@@ -20,15 +20,16 @@ const usuarioSchema = new mongoose.Schema({
         type: String,
         default: null
     },
- 
+    // ROL: Por defecto todos son usuarios (Punto 2)
     rol: {
         type: String,
         enum: ["admin", "usuario"],
-        default: "usuario" // Todos se registran como usuarios normales
+        default: "usuario" 
     },
+    // SUSPENDIDO: Por defecto false (Punto 8)
     suspendido: {
         type: Boolean,
-        default: false // Por defecto la cuenta está activa
+        default: false
     }
 });
 

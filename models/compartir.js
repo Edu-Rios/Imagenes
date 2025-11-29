@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const compartirSchema = new mongoose.Schema({
     emisor: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Usuario",
+        ref: "Usuario", // Debe coincidir con mongoose.model("Usuario", ...)
         required: true
     },
     receptor: {
@@ -13,7 +13,7 @@ const compartirSchema = new mongoose.Schema({
     },
     articulo: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Articulos",
+        ref: "Articulos", // Debe coincidir con mongoose.model("Articulos", ...)
         required: true
     },
     fecha: {

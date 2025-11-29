@@ -1,11 +1,17 @@
 <%- include ("templates/header.ejs", {titulo:"INICIO"}) %> 
-  <h1 class="text-primary">INICIO</h1>
+  <h1 class="text-primary mt-3">INICIO</h1>
+  
+  <div class="d-flex justify-content-end mb-3">
+      <a href="/misCompartidos" class="btn btn-outline-info">
+          <i class="bi bi-share"></i> Ver mis compartidos
+      </a>
+  </div>
 
    <div class="container mt-4">
        <% categorias.forEach(function(categoria) { %>
-         <div class="category-section mb-5">
-           <h3 class="mb-3"><%= categoria.nombre %></h3>
-           <table class="table table-striped">
+         <div class="category-section mb-5 border p-3 rounded shadow-sm">
+           <h3 class="mb-3 text-secondary"><%= categoria.nombre %></h3>
+           <table class="table table-striped table-hover">
              <thead>
                <tr>
                  <th>Nombre</th>
@@ -15,15 +21,14 @@
              </thead>
              <tbody>
             <% const articulosCategoria = articulos.filter(art => 
-                art.categoria && 
-                art.categoria._id && 
+                art.categoria && art.categoria._id && 
                 art.categoria._id.toString() === categoria._id.toString()
             ) %>
             <% if(articulosCategoria.length > 0) { %>
                 <% articulosCategoria.forEach(function(articulo) { %>
                     <tr>
                         <td><%= articulo.nombre %></td>
-                        <td><%= articulo.calificacion %></td>
+                        <td><%= articulo.calificacion %> / 5</td>
                         <td>
                             <a href="/editar/<%= articulo._id %>" class="btn btn-warning btn-sm">Editar</a>
                             <a href="/eliminarArticulo/<%= articulo._id %>" class="btn btn-danger btn-sm">Eliminar</a>
@@ -33,7 +38,7 @@
                 <% }); %>
             <% } else { %>
                 <tr>
-                    <td colspan="3" class="text-center">No hay artículos en esta categoría</td>
+                    <td colspan="3" class="text-center text-muted">No hay artículos aquí</td>
                 </tr>
             <% } %>
             </tbody>

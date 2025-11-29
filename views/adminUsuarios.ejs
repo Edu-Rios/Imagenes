@@ -2,47 +2,55 @@
 
 <div class="container mt-4">
     <h2>Gestión de Usuarios</h2>
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Usuario</th>
-                <th>Rol Actual</th>
-                <th>Estado</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% usuarios.forEach(user => { %>
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>
-                        <strong><%= user.usuario %></strong><br>
-                        <small class="text-muted"><%= user.nombre %></small>
-                    </td>
-                    <td><%= user.rol %></td>
-                    <td>
-                        <% if(user.suspendido) { %>
-                            <span class="badge bg-danger">Suspendido</span>
-                        <% } else { %>
-                            <span class="badge bg-success">Activo</span>
-                        <% } %>
-                    </td>
-                    <td>
-                        <% if(user.rol === 'usuario') { %>
-                            <a href="/admin/hacerAdmin/<%= user._id %>" class="btn btn-sm btn-outline-info">Hacer Admin</a>
-                        <% } else { %>
-                            <a href="/admin/hacerUsuario/<%= user._id %>" class="btn btn-sm btn-outline-secondary">Hacer Usuario</a>
-                        <% } %>
-
-                        <% if(user.suspendido) { %>
-                            <a href="/admin/activar/<%= user._id %>" class="btn btn-sm btn-success">Reactivar</a>
-                        <% } else { %>
-                            <a href="/admin/suspender/<%= user._id %>" class="btn btn-sm btn-danger">Suspender</a>
-                        <% } %>
-                    </td>
+                    <th>Usuario</th>
+                    <th>Rol Actual</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
                 </tr>
-            <% }) %>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <% usuarios.forEach(user => { %>
+                    <tr>
+                        <td>
+                            <strong><%= user.usuario %></strong><br>
+                            <span class="text-muted"><%= user.nombre %></span>
+                        </td>
+                        <td>
+                            <% if(user.rol === 'admin') { %>
+                                <span class="badge bg-primary">Admin</span>
+                            <% } else { %>
+                                <span class="badge bg-secondary">Usuario</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if(user.suspendido) { %>
+                                <span class="badge bg-danger">Suspendido</span>
+                            <% } else { %>
+                                <span class="badge bg-success">Activo</span>
+                            <% } %>
+                        </td>
+                        <td>
+                            <% if(user.rol === 'usuario') { %>
+                                <a href="/admin/hacerAdmin/<%= user._id %>" class="btn btn-sm btn-outline-primary">Hacer Admin</a>
+                            <% } else { %>
+                                <a href="/admin/hacerUsuario/<%= user._id %>" class="btn btn-sm btn-outline-secondary">Hacer Usuario</a>
+                            <% } %>
+
+                            <% if(user.suspendido) { %>
+                                <a href="/admin/activar/<%= user._id %>" class="btn btn-sm btn-success ms-1">Reactivar</a>
+                            <% } else { %>
+                                <a href="/admin/suspender/<%= user._id %>" class="btn btn-sm btn-danger ms-1">Suspender</a>
+                            <% } %>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <%- include("templates/footer.ejs") %>

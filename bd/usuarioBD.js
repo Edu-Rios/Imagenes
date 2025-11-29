@@ -2,7 +2,6 @@ import Usuario from "../models/usuario.js";
 import fs from "fs";
 import path from "path";
 
-// Función auxiliar para borrar la foto del servidor
 function borrarFotoFisica(nombreFoto) {
     if (nombreFoto) {
         const ruta = path.join(path.resolve(), "web", "images", nombreFoto);
@@ -18,10 +17,9 @@ export const registrarUsuario = async ({ nombre, usuario, contrasenya, rol, foto
       nombre,
       usuario,
       contrasenya,
-      rol, // Si viene undefined, usará el default del modelo ("usuario")
+      rol, 
       foto 
     });
-
     const respuestaMongo = await nuevoUsuario.save();
     return respuestaMongo;
   } 
@@ -38,9 +36,9 @@ export const verificarUsuario = async ({ usuario, contrasenya }) => {
     return { exito: false, mensaje: "Usuario no encontrado" };
   }
 
-  // ---> NUEVO: Verificación de suspensión (Punto 9)
+  // VALIDACIÓN DE SUSPENSIÓN (Punto 9)
   if (usuarioEncontrado.suspendido) {
-      return { exito: false, mensaje: "Usuario suspendido. Contacte al administrador." };
+      return { exito: false, mensaje: "Cuenta suspendida. Contacte al administrador." };
   }
 
   if (usuarioEncontrado.contrasenya !== contrasenya) {
@@ -51,51 +49,44 @@ export const verificarUsuario = async ({ usuario, contrasenya }) => {
 };
 
 export const obtenerUsuarioPorId = async (id) => {
-    const usuario = await Usuario.findById(id).lean();
-    return usuario;
+    return await Usuario.findById(id).lean();
 };
 
 export const editarUsuario = async (id, datos, nuevaFoto) => {
     const usuarioAntiguo = await Usuario.findById(id);
-
     if (nuevaFoto && usuarioAntiguo.foto) {
         borrarFotoFisica(usuarioAntiguo.foto);
     }
-    
     const datosActualizar = { 
         nombre: datos.nombre,
         usuario: datos.usuario,
         contrasenya: datos.contrasenya
     };
-
     if (nuevaFoto) {
         datosActualizar.foto = nuevaFoto;
     }
-
-    const respuestaMongo = await Usuario.findByIdAndUpdate(id, datosActualizar, { new: true });
-    return respuestaMongo;
+    return await Usuario.findByIdAndUpdate(id, datosActualizar, { new: true });
 };
 
 export const eliminarUsuario = async (id) => {
     const usuario = await Usuario.findById(id);
-    
     if (usuario && usuario.foto) {
         borrarFotoFisica(usuario.foto);
     }
-
-    const usuarioEliminado = await Usuario.findByIdAndDelete(id);
-    return usuarioEliminado;
+    return await Usuario.findByIdAndDelete(id);
 };
 
-// ---> NUEVAS FUNCIONES PARA ADMINISTRADOR (Puntos 3 y 8)
+
+
 export const obtenerTodosLosUsuarios = async () => {
     return await Usuario.find().lean();
 }
 
-export const cambiarEstadoUsuario = async (id, nuevoEstadoSuspension) => {
-    return await Usuario.findByIdAndUpdate(id, { suspendido: nuevoEstadoSuspension });
+export const cambiarEstadoUsuario = async (id, estado) => {
+
+    return await Usuario.findByIdAndUpdate(id, { suspendido: estado });
 }
 
-export const cambiarRolUsuario = async (id, nuevoRol) => {
-    return await Usuario.findByIdAndUpdate(id, { rol: nuevoRol });
+export const cambiarRolUsuario = async (id, rol) => {
+    return await Usuario.findByIdAndUpdate(id, { rol: rol });
 }
