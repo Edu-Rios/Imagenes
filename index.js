@@ -7,27 +7,32 @@ import path from "path";
 
 const app = express();
 
-// Middleware
+// Middleware de parseo
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.set("view engine", "ejs");
 
 // Configurar sesión
 app.use(session({
-  secret: process.env.SECRET_SESSION,
+  secret: process.env.SECRET_SESSION || "secreto_super_seguro", // Fallback por si no hay .env
   resave: false,
-  name:process.env.NOMBRE_COOKIE,
+  name: process.env.NOMBRE_COOKIE || "session_usuario",
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false,
+    secure: false, // true si usas https
     path:"/",
     maxAge: 1000 * 60 * 60
   }
 }));
 
-
 app.use("/", express.static(path.join(path.resolve(), "/web"))); 
+
+// ---> NUEVO: Middleware para pasar la sesión a las vistas (header, footer, etc)
+app.use((req, res, next) => {
+    res.locals.session = req.session; 
+    next();
+});
 
 // Rutas
 app.use("/", rutas);
